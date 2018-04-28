@@ -1,0 +1,184 @@
+<!-- 
+# Copyright (c) 2017-present, Facebook, Inc.
+# All rights reserved.
+#
+# This source code is licensed under the license found in the
+# LICENSE file in the root directory of this source tree.
+#
+-->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.js"></script>
+<script src="js/jquery.ext.js"></script>
+<html>
+<head>
+   <link rel="stylesheet" type="text/css" href="css/v.css">
+   <script src="js/sprintf.min.js"></script>
+   <script src="js/Abs.js"></script>
+   <script src="js/Abs_util.js"></script>
+   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+   <!-- Latest compiled and minified JavaScript -->
+   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+<script>
+
+var path_to_data = 'output/';
+
+// Utility /////////////////////////////////////////////////////////////////////
+var inList = function(el, set) {
+  if (set.indexOf(el) >= 0) return true; else false;
+}
+
+// Common //////////////////////////////////////////////////////////////////////
+var getSessionIds = function() {
+  var sessionIds = [];
+  var excludeIds = [256,257,480,481,493,494,1256,1257,1480,1481,1493,1494,2256,2257,2480,2481,2493,2494,4372,4933,4987,6712,7273,7327,9052,9613,9667];  // number list
+  for(var i=0; i<10020; i++) {
+    if (!inList(i, excludeIds)) {
+      var split = (0==(i+1)%10) ? 'test' : ((9==(i+1)%10) ? 'val' : 'train');
+      var sessionId = split+'_'+sprintf('%05d', i);
+      sessionIds.push(sessionId);
+    }
+  }
+  return sessionIds;
+}
+
+// Navigation //////////////////////////////////////////////////////////////////
+var makeOptionTag = function(val, selected, body) {
+  var el = document.createElement('option');
+  el.value = val;
+  el.selected = selected ? 'selected' : null;
+  el.innerHTML = body;
+  return el;
+}
+var updateNav = function(sessionId, clazz) {
+  if (!sessionId) {
+    $('li.'+clazz).addClass('disabled');
+    $('li.'+clazz+' a').attr('href', '#')
+  } else {
+    $('li.'+clazz+' a').attr('href', '?session='+encodeURIComponent(sessionId));
+  }
+}
+var fillSessionList = function(sessionIds) {
+  var older, newer;
+  for(var i=0; i<sessionIds.length; i++) {
+    if (sessionIds.length > 0 && sessionIds[i]==params.session) {
+      older = (i-1 >= 0) ? sessionIds[i-1] : null;
+      newer = (i+1 < sessionIds.length) ? sessionIds[i+1] : null;
+    }
+    var op = makeOptionTag(sessionIds[i], sessionIds[i]==params.session, sessionIds[i]);
+    $('#session').append(op);
+  }
+  updateNav(older, 'previous');
+  updateNav(newer, 'next');
+  // random sampling
+  var rIdx = Math.floor(Math.random()*sessionIds.length);
+  updateNav(sessionIds[rIdx], 'random');
+}
+var initSessionList = function(dynamic) {  // asynchronously called by ready()
+  var dynamic = true;
+  var sessionIds = getSessionIds();
+  fillSessionList(sessionIds);
+}
+
+// Data Visualize //////////////////////////////////////////////////////////////
+var makeMsgTag = function(msg) {
+  var el = $('<a/>', {
+      'href': '#',
+      'class': 'chat-msg list-group-item',
+      'data-toggle': 'tooltip',
+      'text': msg
+    });
+  return el;
+}
+var makeFinTag = function(scene) {
+  var el = makeMsgTag('Fin.');
+  el.attr('id','fin')
+  el.addClass('chat-center');
+  el.attr('scene', scene);
+  return el;
+}
+var makePeekTag = function(scene) {
+  var el = makeMsgTag('Chance to peek is used by Teller');
+  el.addClass('chat-peep');
+  el.attr('scene', scene);
+  return el; 
+}
+var visualizeDialog = function(obj) {
+  var msg_keys = ['msg_t', 'msg_d'];
+  var abs_keys = ['abs_b', 'abs_d'];
+  var scene;
+  for (var i in obj.dialog) {
+    for (var j in msg_keys) {
+      scene = obj.dialog[i][abs_keys[j]];
+      if (j==0 && obj.dialog[i].peeked) {
+        var el = makePeekTag(scene);
+        $('#chat-box .list-group').append(el);
+      }
+      var el = makeMsgTag(obj.dialog[i][msg_keys[j]]);
+      el.attr('scene', scene);
+      el.addClass('chat-'+(j==0 ? 'left' : 'right'));  // text-align for role
+      if (el.html().length>0)  // remove empty messages (possibly first & last)
+        $('#chat-box .list-group').append(el);
+    }
+  }
+  // Fin entry
+  var el = makeFinTag(scene);
+  $('#chat-box .list-group').append(el);
+  // Ground-truth image
+  $('#original_canvas').attr('value', obj.abs_t);
+}
+
+// Initialize //////////////////////////////////////////////////////////////////
+var init = function(callback) {
+  // load data
+  var idx = $.getUrlParameter('session');
+  if (!idx) {
+    window.location = '?session=train_00000';
+    window.reload();
+  }
+  $.getJSON(path_to_data+idx+'.json', callback);
+}
+</script>
+</head>
+<body>
+  <div id="header">
+    <div class="page-header">
+      <h1>CoDraw Dataset Visualizer <br/><small>Rollover on messages to check the abstract scene at that moment!</small></h1>
+    </div>
+    <select id="session" class="form-control">
+      <option selected>Select a HIT session</option>
+    </select>
+    <nav aria-label="...">
+      <ul class="pager">
+        <li class="previous">
+          <a href="#"><span aria-hidden="true">&larr;</span> Older</a>
+        </li>
+        <li class="random">
+          <a href="#">Random</a>
+        </li>
+        <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
+      </ul>
+    </nav>
+  </div>
+  <br/>
+  <div id="cliparts">
+  </div>
+  <div id="container">
+    <div id="canvas-box" data-spy="affix" data-offset-top="330" data-offset-bottom="60">
+      <canvas id="scene_canvas" width="500" height="400"></canvas>
+      <div><span class="label label-default label-scene" data-toggle="tooltip" id="scene-time" title="">Empty</span></div>
+      <hr/>
+      <canvas id="original_canvas" width="500" height="400"></canvas>
+      <div><span class="label label-default label-scene">Original Scene</span></div>
+    </div>
+    <div id="chat-box">
+      <div class="list-group">
+      </div>
+    </div>
+  </div>
+  <div id="credit" class="row">
+      <hr>
+      Developed by <a href="https://github.com/jnhwkim" target="_blank">@jnhwkim</a> as a reserach intern at <a href="http://facebook.com/fair" target="_blank">Facebook AI Research</a>.
+  </div>
+</body>
+<script src="js/v.js"></script>
+</html>

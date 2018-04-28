@@ -1,0 +1,100 @@
+/*
+ Copyright (c) 2017-present, Facebook, Inc.
+ All rights reserved.
+
+ This source code is licensed under the license found in the
+ LICENSE file in the root directory of this source tree.
+*/
+
+body {
+    padding: 15px;
+}
+#header {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+#container {
+    display: table;
+    border-collapse: separate;
+    border-spacing: 20px;
+    margin-top: 0px;
+    vertical-align: top;
+    height: 400px;
+    clear: both;
+}
+#canvas-box {
+    float: left;
+    margin-left: 0;
+    margin-right: 20px;
+    top: 20px;
+}
+#canvas-box.affix-bottom {
+    position: relative;
+}
+#chat-box {
+    width: 390px;
+    min-height: 953px;
+    vertical-align: top;
+    margin-left: 520px;
+}
+#chat-box .chat-left {
+    text-align: left;
+    font-weight: bold;
+}
+#chat-box .chat-right {
+    text-align: right;
+    font-style: italic;
+}
+#chat-box .chat-center {
+    text-align: center;
+    font-style: italic;
+    font-family: serif;
+}
+#chat-box .chat-peep {
+    text-align: center;
+    color: green;
+    font-weight: bold;
+}
+.label.label-default.label-scene {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 18px;
+}
+.tooltip-inner {
+    white-space:pre;
+    max-width:none;
+}
+#credit {
+    margin: 0px;
+    text-align: center;
+    display: block;
+    width: 100%;
+    clear: both;
+}
+#credit hr {
+    margin-top: 30px;
+    margin-bottom: 10px;
+}
+#cliparts {
+    margin-left: 20px;
+    height: 30px;
+}
+.clipart {
+    max-width: 40px;
+    max-height: 30px;
+    margin-right: 3px;
+}
+.btn.disabled.visible {
+    opacity: 1;
+}
+.btn.disabled.visible:hover {
+    opacity: 1;
+}
+.btn.disabled.visible .glyphicon {
+    opacity: 1;
+    color: white;
+    background: none;
+}
+.btn.disabled.visible.btn-default .glyphicon {
+    color: black;
+}
