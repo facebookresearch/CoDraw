@@ -12,6 +12,7 @@ While language-based communication is effective when exchanging high-level ideas
 * [CoDraw v1.0 (149MB)](https://drive.google.com/file/d/0B-u9nH58139bTy1XRFdqaVEzUGs/view?usp=sharing)
 
 ### Links
+* [CoDraw Models](https://github.com/facebookresearch/codraw-models)
 * [Abstract Scenes v1.1](https://vision.ece.vt.edu/clipart/)
 * [VisDial AMT Chat](https://github.com/batra-mlp-lab/visdial-amt-chat)
 
@@ -19,12 +20,12 @@ While language-based communication is effective when exchanging high-level ideas
 
 If you use this dataset as part of any published research, we'd really appreciate it if you could cite the following paper:
 ```
-@article{Kim2017,
-author = {Kim, Jin-Hwa and Parikh, Devi and Batra, Dhruv and Zhang, Byoung-Tak and Tian, Yuandong},
+@article{CoDraw,
+author = {Kim, Jin-Hwa and Kitaev, Nikita and Chen, Xinlei and Rohrbach, Marcus and Tian, Yuandong and Batra, Dhruv and Parikh, Devi},
 journal = {arXiv preprint arXiv:1712.05558},
-title = {{CoDraw: Visual Dialog for Collaborative Drawing}},
+title = {{CoDraw: Collaborative Drawing as a Testbed for Grounded Goal-driven Communication}},
 url = {http://arxiv.org/abs/1712.05558},
-year = {2017}
+year = {2019}
 }
 ```
 
